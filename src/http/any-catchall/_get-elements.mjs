@@ -19,6 +19,7 @@ export default async function getElements (basePath) {
   let pathToPages = join(basePath, 'pages')
   let pathToElements = join(basePath, 'elements')
   let pathToHead = join(basePath, 'head.mjs')
+  let pathToBrowser = join(basePath, 'browser')
 
   // generate elements manifest
   let els = {}
@@ -64,6 +65,34 @@ export default async function getElements (basePath) {
       }
       catch (error) {
         throw new Error(`Issue when trying to import page: ${p}`, { cause: error })
+      }
+    }
+  }
+
+  if (exists(pathToBrowser)) {
+    let browserURL = pathToFileURL(join(basePath, 'browser'))
+    // read all the elements
+    let files = getFiles(basePath, 'browser').filter(f => f.endsWith('.mjs'))
+    for (let e of files) {
+      // turn foo/bar.mjs into foo-bar to make sure we have a legit tag name
+      const fileURL = pathToFileURL(e)
+      let tag = fileURL.pathname.replace(browserURL.pathname, '').slice(1).replace(/.mjs$/, '').replace(/\//g, '-')
+      if (/^[a-z][a-z0-9-]*$/.test(tag) === false) {
+        throw Error(`Illegal element name "${tag}" must be lowercase alphanumeric dash`)
+      }
+      // import the element and add to the map
+      try {
+        let { render } = await import(fileURL.href)
+        /* */
+        els[tag] = function BrowserElement ({ html, state }) {
+          console.log('src/plugin: server render got called')
+          return render({ html, state })
+        }
+        /* */
+      }
+      catch (error) {
+        console.log('src/plugin: ignore browser files that dont export a render function')
+        // throw new Error(`Issue importing browser element: ${e}`, { cause: error })
       }
     }
   }
