@@ -1,5 +1,5 @@
 {
-  "name": "@enhance/arc-plugin-enhance",
+  "name": "@enhance-labs/arc-plugin-enhance",
   "version": "6.2.4",
   "main": "src/plugins/beginner.js",
   "exports": {
