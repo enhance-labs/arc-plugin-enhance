@@ -95,6 +95,24 @@ export default async function getElements (basePath) {
         // throw new Error(`Issue importing browser element: ${e}`, { cause: error })
       }
     }
+
+    let externalElements = JSON.parse(process.env.ELEMENTS)
+    console.log(externalElements)
+    for (let e of externalElements) {
+      let [ elementName, tagName ] = e
+      // import the element and add to the map
+      try {
+        let pkgName = elementName.includes('/') ? `@${elementName}` : elementName
+        let element = await import(pkgName)
+        /* */
+        els[tagName] = element
+        /* */
+      }
+      catch (error) {
+        throw new Error(`Issue importing 3rd party element: ${e}`, { cause: error })
+      }
+    }
+
   }
 
   if (exists(pathToElements)) {
