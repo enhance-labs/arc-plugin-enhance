@@ -1,6 +1,6 @@
 {
   "name": "@enhance-labs/arc-plugin-enhance",
-  "version": "6.2.5-beta.1",
+  "version": "6.2.5-beta.2",
   "main": "src/plugins/beginner.js",
   "exports": {
     ".": "./src/plugins/beginner.js",
